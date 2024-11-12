@@ -1,0 +1,5 @@
+# /home/joy/ansible_hub/jboss_eap/playbook.yml
+- hosts: all
+  become: yes
+  roles:
+    - /home/joy/jboss_eap/roles/jboss-eap

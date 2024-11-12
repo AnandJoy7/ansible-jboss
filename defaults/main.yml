@@ -1,0 +1,6 @@
+# /home/joy/ansible_hub/jboss_eap/roles/jboss-eap/defaults/main.yml
+jboss_eap_version: "7.4"
+jboss_eap_install_dir: "/opt/jboss-eap"
+jboss_eap_files:
+  - src: "/home/joy/ansible-hub/jboss-eap-7.4.0.zip"
+    dest: "/tmp/jboss-eap-7.4.0.zip"

@@ -1,0 +1,6 @@
+# /home/joy/ansible_hub/jboss_eap/roles/jboss-eap/handlers/main.yml
+- name: Restart JBoss EAP service
+  systemd:
+    name: jboss-eap
+    state: restarted
+    enabled: yes

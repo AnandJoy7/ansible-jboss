@@ -1,0 +1,76 @@
+# /home/joy/ansible_hub/jboss_eap/roles/jboss-eap/tasks/main.yml
+
+- name: Install unzip utility (Linux)
+  ansible.builtin.package:
+    name: unzip
+    state: present
+  become: true  # Use elevated privileges to install packages
+
+- name: Display JBoss EAP installation parameters
+  ansible.builtin.debug:
+    msg:
+      - "JBoss EAP version: {{ jboss_eap_version }}"
+      - "JBoss EAP Install Directory: {{ jboss_eap_install_dir }}"
+  become: true
+
+- name: Ensure JBoss EAP installation directory exists
+  ansible.builtin.file:
+    path: "{{ jboss_eap_install_dir }}"
+    state: directory
+    mode: '0755'
+    owner: azureuser
+    group: azureuser
+  become: true
+
+- name: Ensure /tmp directory has correct permissions for copying JBoss EAP ZIP file
+  ansible.builtin.file:
+    path: /tmp
+    state: directory
+    mode: '1777'  # Ensures /tmp is world-writable
+  become: true
+
+- name: Copy JBoss EAP ZIP file to remote server
+  ansible.builtin.copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: '0644'  # Ensures the file has read-write for the owner and read for others
+  loop: "{{ jboss_eap_files }}"
+  become: true
+
+- name: Ensure the JBoss EAP ZIP file has correct permissions on the remote server
+  ansible.builtin.file:
+    path: "{{ item.dest }}"
+    mode: '0644'  # Ensures that the copied file is readable by all users
+    owner: azureuser
+    group: azureuser
+  loop: "{{ jboss_eap_files }}"
+  become: true
+
+- name: Unzip JBoss EAP
+  ansible.builtin.unarchive:
+    src: "{{ item.dest }}"  # Path to the copied ZIP file on the remote server
+    dest: "{{ jboss_eap_install_dir }}"
+    remote_src: yes
+  loop: "{{ jboss_eap_files }}"
+  become: true
+
+- name: Ensure the unzipped JBoss EAP directory has correct permissions
+  ansible.builtin.file:
+    path: "{{ jboss_eap_install_dir }}"
+    state: directory
+    mode: '0755'
+    owner: azureuser
+    group: azureuser
+  become: true
+
+- name: Remove JBoss EAP ZIP file after extraction
+  ansible.builtin.file:
+    path: "{{ item.dest }}"
+    state: absent
+  loop: "{{ jboss_eap_files }}"
+  become: true
+
+- name: Display JBoss EAP installation success message
+  ansible.builtin.debug:
+    msg: "JBoss EAP version {{ jboss_eap_version }} installed successfully at {{ jboss_eap_install_dir }}"
+  become: true
